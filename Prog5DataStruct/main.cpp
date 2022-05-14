@@ -5,6 +5,8 @@
 #include <queue>
 #include <deque>
 #include <vector>
+#include <set>
+#include <unordered_set>
 using namespace std;
 
 void list_push_front(list<int> myList);
@@ -31,13 +33,16 @@ void swap(int* a, int* b);
 
 int main() {
    auto start = chrono::high_resolution_clock::now();
-   const int MAX_NUM = 99;
+   const int MAX_NUM = 990000;
    list<int> myList;
    stack<int> myStack;
    queue<int> myQueue;
    deque<int> myDeque;
    vector<int> myVector;
-   vector<int> origVector;
+   vector<int> origVector; // copy of vector
+   set<int> mySet;
+   unordered_set<int> myUnorderedSet;
+   
 
    for (int i = 0; i < MAX_NUM; i++) {
       myList.push_back(rand());
@@ -45,6 +50,8 @@ int main() {
       myQueue.push(rand());
       myDeque.push_back(rand());
       myVector.push_back(rand());
+      mySet.insert(rand());
+      myUnorderedSet.insert(rand());
    }
 
    for (int i = 0; i < myVector.size(); i++) {
@@ -75,12 +82,9 @@ int main() {
    auto finish = chrono::high_resolution_clock::now();
    chrono::duration<double> elapsed = finish - start;
    cout << fixed << elapsed.count() << " s; ";
+   cout << endl << endl;
 
    int size = myVector.size();
-   for (int i = 0; i < size; i++) {
-      cout << myVector[i] << " ";
-   }
-   cout << endl << endl;
 
    cout << "QUICK SORT:\n";
    start = chrono::high_resolution_clock::now();
@@ -88,10 +92,8 @@ int main() {
    finish = chrono::high_resolution_clock::now();
    elapsed = finish - start;
    cout << fixed << elapsed.count() * 1000 << " ms; ";
-   for (int i = 0; i < size; i++) {
-      cout << myVector[i] << " ";
-   }
-   cout << endl << endl;
+   cout << endl << endl; 
+   // replace the vector with its original contents
    for (int i = 0; i < myVector.size(); i++) {
       myVector[i] = origVector[i];
    }
@@ -102,10 +104,8 @@ int main() {
    finish = chrono::high_resolution_clock::now();
    elapsed = finish - start;
    cout << fixed << elapsed.count() * 1000 << " ms; ";
-   for (int i = 0; i < size; i++) {
-      cout << myVector[i] << " ";
-   }
    cout << endl << endl;
+   // replace the vector with its original contents
    for (int i = 0; i < myVector.size(); i++) {
       myVector[i] = origVector[i];
    }
@@ -116,12 +116,51 @@ int main() {
    finish = chrono::high_resolution_clock::now();
    elapsed = finish - start;
    cout << fixed << elapsed.count() * 1000 << " ms; ";
-   for (int i = 0; i < size; i++) {
-      cout << myVector[i] << " ";
-   }
+   cout << endl << endl;
+   // replace the vector with its original contents
    for (int i = 0; i < myVector.size(); i++) {
       myVector[i] = origVector[i];
    }
+
+   cout << "SEARCH IN VECTOR:\n";
+   start = chrono::high_resolution_clock::now();
+   if (find(myVector.begin(), myVector.end(), 12883) != myVector.end())
+      cout << "Found\n";
+   else cout << "Not found\n";
+   finish = chrono::high_resolution_clock::now();
+   elapsed = finish - start;
+   cout << fixed << elapsed.count() * 1000 << " ms; ";
+   cout << endl << endl;
+
+   cout << "SEARCH IN LIST: \n";
+   start = chrono::high_resolution_clock::now();
+   if (find(myList.begin(), myList.end(), 12883) != myList.end())
+      cout << "Found\n";
+   else cout << "Not found\n";
+   finish = chrono::high_resolution_clock::now();
+   elapsed = finish - start;
+   cout << fixed << elapsed.count() * 1000 << " ms; ";
+   cout << endl << endl;
+
+   cout << "SEARCH IN SET: \n";
+   start = chrono::high_resolution_clock::now();
+   if (find(mySet.begin(), mySet.end(), 12883) != mySet.end())
+      cout << "Found\n";
+   else cout << "Not found\n";
+   finish = chrono::high_resolution_clock::now();
+   elapsed = finish - start;
+   cout << fixed << elapsed.count() * 1000 << " ms; ";
+   cout << endl << endl;
+
+   cout << "SEARCH IN UNORDERED SET: \n";
+   start = chrono::high_resolution_clock::now();
+   if (find(myUnorderedSet.begin(), myUnorderedSet.end(), 12883) != myUnorderedSet.end())
+      cout << "Found\n";
+   else cout << "Not found\n";
+   finish = chrono::high_resolution_clock::now();
+   elapsed = finish - start;
+   cout << fixed << elapsed.count() * 1000 << " ms; ";
+   cout << endl << endl;
 
    return 0;
 }
