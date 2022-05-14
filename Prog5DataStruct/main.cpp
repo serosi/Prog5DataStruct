@@ -20,8 +20,10 @@ void deque_push_back(deque<int> myDeque);
 void deque_pop_front(deque<int> myDeque);
 void deque_pop_back(deque<int> myDeque);
 
-void heap_sort(vector<int> myVector);
-void merge_sort(vector<int> myVector);
+void heapify(vector<int> &myVector, int size, int i);
+void heap_sort(vector<int> &myVector);
+void merge(vector<int> &myVector, int low, int mid, int high);
+void merge_sort(vector<int> &myVector, int low, int high);
 void quick_sort(vector<int> &myVector, int low, int high);
 int partition(vector<int> &myVector, int low, int high);
 void swap(int* a, int* b);
@@ -29,12 +31,13 @@ void swap(int* a, int* b);
 
 int main() {
    auto start = chrono::high_resolution_clock::now();
-   const int MAX_NUM = 990000;
+   const int MAX_NUM = 99;
    list<int> myList;
    stack<int> myStack;
    queue<int> myQueue;
    deque<int> myDeque;
    vector<int> myVector;
+   vector<int> origVector;
 
    for (int i = 0; i < MAX_NUM; i++) {
       myList.push_back(rand());
@@ -42,6 +45,10 @@ int main() {
       myQueue.push(rand());
       myDeque.push_back(rand());
       myVector.push_back(rand());
+   }
+
+   for (int i = 0; i < myVector.size(); i++) {
+      origVector.push_back(myVector[i]);
    }
 
    cout << "LIST:\n";
@@ -69,18 +76,52 @@ int main() {
    chrono::duration<double> elapsed = finish - start;
    cout << fixed << elapsed.count() << " s; ";
 
-   cout << "QUICK SORT:\n";
-
-   start = chrono::high_resolution_clock::now();
    int size = myVector.size();
+   for (int i = 0; i < size; i++) {
+      cout << myVector[i] << " ";
+   }
+   cout << endl << endl;
+
+   cout << "QUICK SORT:\n";
+   start = chrono::high_resolution_clock::now();
    quick_sort(myVector, 0, size - 1);
    finish = chrono::high_resolution_clock::now();
    elapsed = finish - start;
    cout << fixed << elapsed.count() * 1000 << " ms; ";
+   for (int i = 0; i < size; i++) {
+      cout << myVector[i] << " ";
+   }
+   cout << endl << endl;
+   for (int i = 0; i < myVector.size(); i++) {
+      myVector[i] = origVector[i];
+   }
 
-   //for (int i = 0; i < size; i++) {
-   //   cout << myVector[i] << " ";
-   //}
+   cout << "MERGE SORT:\n";
+   start = chrono::high_resolution_clock::now();
+   merge_sort(myVector, 0, size - 1);
+   finish = chrono::high_resolution_clock::now();
+   elapsed = finish - start;
+   cout << fixed << elapsed.count() * 1000 << " ms; ";
+   for (int i = 0; i < size; i++) {
+      cout << myVector[i] << " ";
+   }
+   cout << endl << endl;
+   for (int i = 0; i < myVector.size(); i++) {
+      myVector[i] = origVector[i];
+   }
+
+   cout << "HEAP SORT:\n";
+   start = chrono::high_resolution_clock::now();
+   heap_sort(myVector);
+   finish = chrono::high_resolution_clock::now();
+   elapsed = finish - start;
+   cout << fixed << elapsed.count() * 1000 << " ms; ";
+   for (int i = 0; i < size; i++) {
+      cout << myVector[i] << " ";
+   }
+   for (int i = 0; i < myVector.size(); i++) {
+      myVector[i] = origVector[i];
+   }
 
    return 0;
 }
@@ -290,22 +331,84 @@ void deque_pop_back(deque<int> myDeque) {
    cout << fixed << "Average: " << avg * 1000 << " ms" << endl << endl;
 }
 
-//void heap_sort(vector<int> myVector) {
-//   int leftChild, rightChild, maxIndex;
-//   for (int i = myVector.size() / 2 - 1; i >= 0; i--) {
-//      leftChild = myVector[2 * 0 + 1];
-//      rightChild = myVector[2 * 0 + 2];
-//      maxIndex = max_element(myVector[i], leftChild, rightChild);
-//      if (i != maxIndex)
-//         swap(myVector[i], myVector[maxIndex]);
-//   }
-//   for (int i = 0; i < myVector.size(); i++) {
-//      cout << myVector[i];
-//   }
-//}
+void heapify(vector<int>& myVector, int i, int size) {
+   int largest = i;
+   int left = (2 * i) + 1;
+   int right = left + 1;
 
-void merge_sort(vector<int> myVector) {
+   if (left < size && myVector[left] > myVector[i]) {
+      largest = left;
+   }
+   else {
+      largest = i;
+   }
 
+   if (right < size && myVector[right] > myVector[largest])
+      largest = right;
+
+   if (largest != i) {
+      swap(myVector[i], myVector[largest]);
+      heapify(myVector, largest, size);
+   }
+
+
+}
+
+void build_max_heap(std::vector<int> &myVector)
+{
+   for (int i = (myVector.size() / 2); i >= 0; i--)
+      heapify(myVector, i, myVector.size());
+}
+
+void heap_sort(vector<int> &myVector) {
+   build_max_heap(myVector);
+   int size = myVector.size();
+   int tmpSize = size;
+   for (int i = size - 1; i > 0; i--) {
+      swap(myVector[0], myVector[i]);
+      tmpSize--;
+      heapify(myVector, 0, tmpSize);
+   }
+}
+
+void merge(vector<int> &myVector, int low, int mid, int high) {
+   vector<int> temp;
+   int i, j;
+   i = low;
+   j = mid + 1;
+
+   while (i <= mid && j <= high) {
+      if (myVector[i] <= myVector[j]) {
+         temp.push_back(myVector[i]);
+         ++i;
+      }
+      else {
+         temp.push_back(myVector[j]);
+         ++j;
+      }
+   }
+   while (i <= mid) {
+      temp.push_back(myVector[i]);
+      ++i;
+   }
+   while (j <= high) {
+      temp.push_back(myVector[j]);
+      ++j;
+   }
+   for (int i = low; i <= high; ++i) {
+      myVector[i] = temp[i - low];
+   }
+
+
+}
+
+void merge_sort(vector<int> &myVector, int low, int high) {
+   if (low < high) {
+      int mid = (low + high) / 2;
+      merge_sort(myVector, low, mid);
+      merge_sort(myVector, mid + 1, high);
+      merge(myVector, low, mid, high);
+   }
 }
 void quick_sort(vector<int> &myVector, int low, int high) {
    if (low < high) {
